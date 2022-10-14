@@ -20,7 +20,7 @@
 #
 # By: Michael Curtis and Robert Prechtel
 # Date: 29/5/2020
-# Version 2.05
+# Version 2.06
 # README: This script is an unsupported solution provided by
 #           Sophos Professional Services
 import requests
@@ -95,7 +95,7 @@ def get_all_sub_estates():
     # Find the number of pages we will need to search to get all the sub estates
     total_pages = sub_estate_json["pages"]["total"]
     # Set the keys you want in the list
-    sub_estate_keys = ('id', 'name', 'dataRegion')
+    sub_estate_keys = ('id', 'name', 'dataRegion', 'showAs')
     while (total_pages != 0):
     #Paged URL https://api.central.sophos.com/organization/v1/tenants?page=2 add total pages in a loop
         request_sub_estates = requests.get(f"{'https://api.central.sophos.com/'}{organization_type}{'/v1/tenants?page='}{total_pages}", headers=headers)
@@ -105,7 +105,7 @@ def get_all_sub_estates():
             #Make a temporary Dictionary to be added to the sub estate list
             sub_estate_dictionary = {key:value for key, value in all_sub_estates.items() if key in sub_estate_keys}
             sub_estate_list.append(sub_estate_dictionary)
-            print(f"Sub Estate - {sub_estate_dictionary['name']}. Sub Estate ID - {sub_estate_dictionary['id']}")
+            print(f"Sub Estate - {sub_estate_dictionary['showAs']}. Sub Estate ID - {sub_estate_dictionary['id']}")
         total_pages -= 1
     # Remove X-Organization-ID from headers dictionary. We don't need this anymore
     del headers[organization_header]
@@ -279,7 +279,7 @@ if organization_type != "tenant":
     get_all_sub_estates()
     for sub_etates_in_list in range(len(sub_estate_list)):
         sub_estate = sub_estate_list[sub_etates_in_list]
-        get_all_computers(sub_estate['id'], f"{'https://api-'}{sub_estate['dataRegion']}{'.central.sophos.com/endpoint/v1'}", sub_estate['name'])
+        get_all_computers(sub_estate['id'], f"{'https://api-'}{sub_estate['dataRegion']}{'.central.sophos.com/endpoint/v1'}", sub_estate['showAs'])
 else:
     print(f"Sophos Central is a {organization_type}")
     # Removes sub estate name from report if the console is a single tenant
