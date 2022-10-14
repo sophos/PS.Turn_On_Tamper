@@ -4,3 +4,6 @@ This script replaces the previous scripts Turn_On_Tamper_EDB_MSP and Turn_On_Tam
 
 v2.05
 Fixed an issue when the script was run against a Sophos Central Enterprise Dashboard
+
+v2.06
+Fixed an issue where sub estate names maybe report incorrectly
