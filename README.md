@@ -6,4 +6,4 @@ v2.05
 Fixed an issue when the script was run against a Sophos Central Enterprise Dashboard
 
 v2.06
-Fixed an issue where sub estate names maybe report incorrectly
+Fixed an issue where sub estate names may report incorrectly
