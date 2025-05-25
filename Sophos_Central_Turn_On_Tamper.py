@@ -20,11 +20,12 @@
 #
 # By: Michael Curtis and Robert Prechtel
 # Date: 29/5/2020
-# Version 2.06
+# Version 2025.1
 # README: This script is an unsupported solution provided by
 #           Sophos Professional Services
 import requests
 import csv
+import sys
 import configparser
 import json
 # Import getpass for Client Secret
@@ -32,6 +33,7 @@ import getpass
 # Import datetime modules
 from datetime import date
 from datetime import datetime
+from datetime import timezone
 # Import OS to allow to check which OS the script is being run on
 import os
 today = date.today()
@@ -41,6 +43,18 @@ timestamp = str(now.strftime("%d%m%Y_%H-%M-%S"))
 sub_estate_list = []
 # This list will hold all the computers
 computer_list = []
+
+class bcolours:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 # Get Access Token - JWT in the documentation
 def get_bearer_token(client, secret, url):
@@ -52,6 +66,9 @@ def get_bearer_token(client, secret, url):
             }
     request_token = requests.post(url, auth=(client, secret), data=d)
     json_token = request_token.json()
+    if request_token.status_code != 200:
+        print(f"{bcolours.FAIL}Failed to get token. Check you API keys and network connection to Sophos Central: Code {request_token.status_code}{bcolours.ENDC}")
+        sys.exit(1)
     #headers is used to get data from Central
     #headers = {'Authorization': str('Bearer ' + json_token['access_token'])}
     headers = {'Authorization': f"Bearer {json_token['access_token']}"}
@@ -190,12 +207,17 @@ def turn_on_tamper(machine_id, endpoint_url, post_header):
     return result
 
 def get_days_since_last_seen(report_date):
-    # https://www.programiz.com/python-programming/datetime/strptime
-    # Converts report_date from a string into a DataTime
-    convert_last_seen_to_a_date = datetime.strptime(report_date, "%Y-%m-%dT%H:%M:%S.%f%z")
-    # Remove the time from convert_last_seen_to_a_date
-    convert_last_seen_to_a_date = datetime.date(convert_last_seen_to_a_date)
-    # Converts date to days
+    try:
+        dt = datetime.strptime(report_date, "%Y-%m-%dT%H:%M:%S.%f%z")
+    except ValueError:
+        dt = datetime.strptime(report_date, "%Y-%m-%dT%H:%M:%S%z")
+
+    # Remove microseconds and convert to datew
+    convert_last_seen_to_a_date = dt.replace(microsecond=0).date()
+
+    # Today's date in UTC to match the timezone of the report date
+    today = datetime.now(timezone.utc).date()
+
     days = (today - convert_last_seen_to_a_date).days
     return days
 
