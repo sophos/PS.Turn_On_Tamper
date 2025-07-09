@@ -20,7 +20,7 @@
 #
 # By: Michael Curtis and Robert Prechtel
 # Date: 29/5/2020
-# Version 2025.1
+# Version 2025.7
 # README: This script is an unsupported solution provided by
 #           Sophos Professional Services
 import requests
@@ -135,7 +135,8 @@ def get_all_computers(sub_estate_token, url, sub_estate_name):
     # Add pageSize to url and the view of full
     pagesize = 500
     tamper_url = url
-    url = (f"{url}{'/endpoints?pageSize='}{pagesize}")
+    # url = (f"{url}{'/endpoints?pageSize='}{pagesize}")
+    url = f"{url}{'/endpoints?pageSize='}{pagesize}{'&sort=id:desc'}{'&view=full'}"
     computers_url = url
     # Loop while the page_count is not equal to 0. We have more computers to query
     page_count = 1
